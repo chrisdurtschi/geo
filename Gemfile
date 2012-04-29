@@ -4,6 +4,7 @@ gem 'yajl-ruby'
 gem 'excon'
 gem 'sidekiq'
 gem 'hashie'
+gem 'grit'
 
 gem 'foreman', require: false
 gem 'sinatra', require: false
