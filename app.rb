@@ -17,6 +17,7 @@ module Geo
         foreman.export 'upstart', '/etc/init'
         STDOUT.puts "Geo::App - exported Foreman upstart scripts"
         STDOUT.puts `restart geo`
+        STDOUT.puts `cd couchapp && soca push`
       else
         STDOUT.puts "Geo::App - nothing to upgrade"
       end

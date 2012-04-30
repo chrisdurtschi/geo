@@ -7,6 +7,7 @@ gem 'hashie'
 gem 'grit'
 
 gem 'foreman', require: false
+gem 'soca', require: false
 gem 'sinatra', require: false
 gem 'slim', require: false
 gem 'sprockets', require: false
