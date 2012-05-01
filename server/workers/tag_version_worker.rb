@@ -15,15 +15,19 @@ class TagVersionWorker
     icon_ldpi: "-resize 24x24",
     icon_mdpi: "-resize 32x32",
     icon_hdpi: "-resize 48x48",
-    transparent_ldpi: "-resize 240x240 -alpha set -channel A -evaluate set 50%",
-    transparent_mdpi: "-resize 320x320 -alpha set -channel A -evaluate set 50%",
-    transparent_hdpi: "-resize 480x480 -alpha set -channel A -evaluate set 50%",
+    icon_xdpi: "-resize 64x64",
+    transparent_ldpi: "-alpha set -channel A -evaluate set 50% -resize 240x240",
+    transparent_mdpi: "-alpha set -channel A -evaluate set 50% -resize 320x320",
+    transparent_hdpi: "-alpha set -channel A -evaluate set 50% -resize 480x480",
+    transparent_xdpi: "-alpha set -channel A -evaluate set 50% -resize 640x640",
+    template: "-resize 640x640",
   }
 
   FORMATS = {
     transparent_ldpi: "png",
     transparent_mdpi: "png",
     transparent_hdpi: "png",
+    transparent_xdpi: "png",
   }
 
   def perform(id)
