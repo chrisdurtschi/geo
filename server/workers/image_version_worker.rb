@@ -8,44 +8,53 @@ require File.join(File.dirname(__FILE__), '..', 'config')
 
 $stdout.sync = true
 
-class TagVersionWorker
+class ImageVersionWorker
   include Sidekiq::Worker
 
   VERSIONS = {
-    icon_ldpi: "-resize 24x24",
-    icon_mdpi: "-resize 32x32",
-    icon_hdpi: "-resize 48x48",
-    icon_xdpi: "-resize 64x64",
-    transparent_ldpi: "-alpha set -channel A -evaluate set 50% -resize 240x240",
-    transparent_mdpi: "-alpha set -channel A -evaluate set 50% -resize 320x320",
-    transparent_hdpi: "-alpha set -channel A -evaluate set 50% -resize 480x480",
-    transparent_xdpi: "-alpha set -channel A -evaluate set 50% -resize 640x640",
-    template: "-resize 640x640",
+    capture: {
+      normalized: "-resize 640x640",
+    },
+    tag: {
+      icon_ldpi: "-resize 24x24",
+      icon_mdpi: "-resize 32x32",
+      icon_hdpi: "-resize 48x48",
+      icon_xdpi: "-resize 64x64",
+      transparent_ldpi: "-alpha set -channel A -evaluate set 50% -resize 240x240",
+      transparent_mdpi: "-alpha set -channel A -evaluate set 50% -resize 320x320",
+      transparent_hdpi: "-alpha set -channel A -evaluate set 50% -resize 480x480",
+      transparent_xdpi: "-alpha set -channel A -evaluate set 50% -resize 640x640",
+      normalized: "-resize 640x640",
+    }
   }
 
   FORMATS = {
-    transparent_ldpi: "png",
-    transparent_mdpi: "png",
-    transparent_hdpi: "png",
-    transparent_xdpi: "png",
+    capture: {},
+    tag: {
+      transparent_ldpi: "png",
+      transparent_mdpi: "png",
+      transparent_hdpi: "png",
+      transparent_xdpi: "png",
+    }
   }
 
   def perform(id)
     @id = id
     response = Excon.get "#{Geo::Config.url}/#{@id}"
-    tag = Yajl::Parser.parse response.body
-    STDOUT.puts "Got a tag: #{tag.inspect}"
+    @doc = Yajl::Parser.parse response.body
+    STDOUT.puts "Got a document: #{@doc.inspect}"
 
-    return if tag['error']
+    return if @doc['error']
 
-    @rev = tag['_rev']
+    @rev  = @doc['_rev']
+    @type = @doc['type'].to_sym
     versions!
     FileUtils.rm_rf(@tmp_path)
   end
 
   def versions!
     download
-    VERSIONS.keys.each do |ver|
+    VERSIONS[@type].keys.each do |ver|
       @version = ver
       version
       upload
@@ -69,8 +78,8 @@ class TagVersionWorker
   end
 
   def version
-    command = VERSIONS[@version]
-    @format = FORMATS[@version] || 'jpg'
+    command = VERSIONS[@type][@version]
+    @format = FORMATS[@type][@version] || 'jpg'
     @versioned = "#{@tmp_path}/#{@version}.#{@format}"
     result = `convert #{@original} #{command} #{@versioned}`
     STDOUT.puts "Attempted versioning #{@original} with #{command}: #{result}"

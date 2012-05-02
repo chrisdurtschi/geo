@@ -19,14 +19,14 @@ class CaptureVerifyWorker
     FileUtils.mkdir_p tmp_path
 
     capture_path = File.join(tmp_path, "capture.jpg")
-    capture_url  = "#{Geo::Config.url}/#{id}/original.jpg"
+    capture_url  = "#{Geo::Config.url}/#{id}/normalized.jpg"
     response     = Excon.get capture_url, expects: 200
     File.open(capture_path, 'wb') do |file|
       file.write response.body
     end
 
     tag_path = File.join(tmp_path, "tag.jpg")
-    tag_url  = "#{Geo::Config.url}/#{capture['tag_id']}/original.jpg"
+    tag_url  = "#{Geo::Config.url}/#{capture['tag_id']}/normalized.jpg"
     response = Excon.get tag_url, expects: 200
     File.open(tag_path, 'wb') do |file|
       file.write response.body
