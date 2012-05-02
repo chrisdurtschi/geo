@@ -32,7 +32,7 @@ class CaptureVerifyWorker
       file.write response.body
     end
 
-    cvoutput = `python match.py #{capture_path} #{tag_path}`.strip
+    cvoutput = `python #{File.expand_path(File.dirname(__FILE__))}/match.py #{capture_path} #{tag_path}`.strip
     STDOUT.puts "CV Output: #{cvoutput}"
 
     match = Yajl::Parser.parse(cvoutput)
