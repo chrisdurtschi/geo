@@ -36,13 +36,32 @@ class CaptureVerifyWorker
     STDOUT.puts "CV Output: #{cvoutput}"
 
     match = Yajl::Parser.parse(cvoutput)
+    image = match.delete 'image'
     capture['match'] = match
 
-    FileUtils.rm_rf tmp_path
+    url = "#{Geo::Config.url}/#{id}"
+    STDOUT.puts "PUTting #{capture} to #{url}"
 
-    Excon.put "#{Geo::Config.url}/#{id}?rev=#{capture['_rev']}",
-              body: Yajl::Encoder.encode(capture),
-              headers: {'Content-Type' => 'application/json'},
-              expects: [200, 201]
+    response = Excon.put url,
+                  body: Yajl::Encoder.encode(capture),
+                  headers: {'Content-Type' => 'application/json'},
+                  expects: [200, 201]
+
+    body = Yajl::Parser.parse response.body
+
+    if image
+      url = "#{Geo::Config.url}/#{id}/match.jpg?rev=#{body['rev']}"
+      STDOUT.puts "Uploading match to #{url}"
+
+      response = Excon.put url,
+                    body: File.open(image),
+                    headers: {"Content-Type" => "image/jpg"},
+                    expects: [200, 201]
+      body = Yajl::Parser.parse response.body
+
+      STDOUT.puts "Finished uploading match: #{body}"
+    end
+
+    FileUtils.rm_rf tmp_path
   end
 end
