@@ -34,11 +34,13 @@ class TagVersionWorker
     @id = id
     response = Excon.get "#{Geo::Config.url}/#{@id}"
     tag = Yajl::Parser.parse response.body
-    STDOUT.puts "Got a Tag: #{tag.inspect}"
-    if tag
-      @rev = tag['_rev']
-      versions!
-    end
+    STDOUT.puts "Got a tag: #{tag.inspect}"
+
+    return if tag['error']
+
+    @rev = tag['_rev']
+    versions!
+    FileUtils.rm_rf(@tmp_path)
   end
 
   def versions!

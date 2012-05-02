@@ -6,6 +6,7 @@ Sidekiq.configure_server do |config|
     STDOUT.puts "inserting Sidekiq::Middleware::Client::UniqueJobs into Sidekiq server middleware"
     chain.add Sidekiq::Middleware::Server::UniqueJobs
   end
+  config.redis = { namespace: "geo" }
 end
 
 Sidekiq.configure_client do |config|
@@ -14,6 +15,7 @@ Sidekiq.configure_client do |config|
     STDOUT.puts "inserting Sidekiq::Middleware::Client::UniqueJobs into Sidekiq client middleware"
     chain.add Sidekiq::Middleware::Client::UniqueJobs
   end
+  config.redis = { size: 1, namespace: "geo" }
 end
 
 Dir['./server/workers/*.rb'].each { |worker| require "./#{worker}" }
