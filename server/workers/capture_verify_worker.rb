@@ -37,6 +37,21 @@ class CaptureVerifyWorker
 
     match = Yajl::Parser.parse(cvoutput)
     image = match.delete 'image'
+
+    if rect = match['min_rect']
+      distances = []
+      perfect   = [[0,0],[640,0],[640,640],[0,640]]
+      rect.each_with_index do |coord, i|
+        x, y   = coord
+        px, py = perfect[i]
+        distances << Math.sqrt((px - x)**2 + (py - y)**2)
+      end
+      average  = distances.inject(0) { |r,e| r+=e } / 4.0
+      accuracy = (640.0 - average) / 640.0
+      accuracy = 0 if accuracy < 0
+      match['accuracy'] = accuracy
+    end
+
     capture['match'] = match
 
     url = "#{Geo::Config.url}/#{id}"
