@@ -11,16 +11,20 @@ $stdout.sync = true
 class ImageVersionWorker
   include Sidekiq::Worker
 
+  CROPPED = "-gravity Center -crop %{length}x%{length}+0+0 +repage".freeze
+
   VERSIONS = {
     capture: {
-      normalized: "-resize 640x640",
+      cropped: CROPPED,
+      normalized: "#{CROPPED} -resize 640x640",
     },
     tag: {
-      icon_ldpi: "-resize 24x24",
-      icon_mdpi: "-resize 32x32",
-      icon_hdpi: "-resize 48x48",
-      icon_xdpi: "-resize 64x64",
-      normalized: "-resize 640x640",
+      cropped: CROPPED,
+      icon_ldpi: "#{CROPPED} -resize 24x24",
+      icon_mdpi: "#{CROPPED} -resize 32x32",
+      icon_hdpi: "#{CROPPED} -resize 48x48",
+      icon_xdpi: "#{CROPPED} -resize 64x64",
+      normalized: "#{CROPPED} -resize 640x640",
     }
   }
 
@@ -39,6 +43,10 @@ class ImageVersionWorker
 
     @rev  = @doc['_rev']
     @type = @doc['type'].to_sym
+
+    @params = {length: @doc['original_height']}
+    @params[:length] = @doc['original_width'] if @doc['original_width'] < @params[:length]
+
     versions!
     FileUtils.rm_rf(@tmp_path)
   end
@@ -69,7 +77,7 @@ class ImageVersionWorker
   end
 
   def version
-    command = VERSIONS[@type][@version]
+    command = VERSIONS[@type][@version] % @params
     @format = FORMATS[@type][@version] || 'jpg'
     @versioned = "#{@tmp_path}/#{@version}.#{@format}"
     result = `convert #{@original} #{command} #{@versioned}`

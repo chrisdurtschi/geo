@@ -5,6 +5,7 @@ function(doc, req) {
        !doc._attachments['icon_mdpi.jpg'] ||
        !doc._attachments['icon_hdpi.jpg'] ||
        !doc._attachments['icon_xdpi.jpg'] ||
+       !doc._attachments['cropped.jpg'] ||
        !doc._attachments['normalized.jpg'])) {
       return true;
     } else if (doc.type === 'capture' && !doc._attachments['normalized.jpg']) {
