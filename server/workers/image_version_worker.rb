@@ -20,22 +20,13 @@ class ImageVersionWorker
       icon_mdpi: "-resize 32x32",
       icon_hdpi: "-resize 48x48",
       icon_xdpi: "-resize 64x64",
-      transparent_ldpi: "-alpha set -channel A -evaluate set 50% -resize 240x240",
-      transparent_mdpi: "-alpha set -channel A -evaluate set 50% -resize 320x320",
-      transparent_hdpi: "-alpha set -channel A -evaluate set 50% -resize 480x480",
-      transparent_xdpi: "-alpha set -channel A -evaluate set 50% -resize 640x640",
       normalized: "-resize 640x640",
     }
   }
 
   FORMATS = {
     capture: {},
-    tag: {
-      transparent_ldpi: "png",
-      transparent_mdpi: "png",
-      transparent_hdpi: "png",
-      transparent_xdpi: "png",
-    }
+    tag: {}
   }
 
   def perform(id)
