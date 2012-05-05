@@ -5,7 +5,6 @@ gem 'excon'
 gem 'sidekiq'
 gem 'hashie'
 gem 'grit'
-gem 'em-http-request'
 
 gem 'foreman', require: false
 gem 'soca', require: false
